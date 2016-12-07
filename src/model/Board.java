@@ -44,27 +44,56 @@ public class Board extends Observable {
     }
 
     private void addPiece(char type, int row, int col){
-        Piece piece;
         Integer[] loc = new Integer[2];
-        loc[0]=row;
-        loc[1]=col;
+        loc[0]=col;
+        loc[1]=row;
+        Piece piece;
         switch (type){
-            case 'K':
-                piece = new King(loc);
             case 'B':
                 piece = new Bishop(loc);
+                break;
+            case 'K':
+                piece = new King(loc);
+                break;
             case 'N':
                 piece = new Knight(loc);
+                break;
             case 'P':
                 piece = new Pawn(loc);
+                break;
             case 'R':
                 piece = new Rook(loc);
+                break;
             case 'Q':
                 piece = new Queen(loc);
+                break;
             default:
                 piece = new Empty(loc);
         }
         pieceList.add(piece);
+    }
+
+    public Piece getPiece(int row, int col){
+        Integer[] loc = new Integer[2];
+        loc[0]=row;
+        loc[1]=col;
+        for (Piece piece :
+                pieceList) {
+            if(piece.getLocation()[0]==loc[0]&&piece.getLocation()[1]==loc[1]){
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    public String getImage(char type) {
+        for (Piece piece :
+                pieceList) {
+            if(piece.toString().equalsIgnoreCase(Character.toString(type))){
+                return piece.getImage();
+            }
+        }
+        return null;
     }
 
     public char[][] getBoardArray() {
@@ -79,6 +108,8 @@ public class Board extends Observable {
                 pieceList.remove(take);
                 move.setLocation(loc);
                 boardArray[temp[0]][temp[1]]='-';
+                boardArray[loc[0]][loc[1]]=move.toString().charAt(0);
+                moves++;
             }
         }
         update();

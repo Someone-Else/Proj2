@@ -42,8 +42,9 @@ public class SoltrChessGUI extends Application implements Observer {
     private int SIZE_H= 4;
     private Button[][] location = new Button[SIZE_W][SIZE_H];
     private char[][] loc = new char[SIZE_W][SIZE_H];
-    private Piece selected;
+    private Piece selected = null;
     private Board board;
+    private ArrayList<Button> buttonList= new ArrayList<Button>();
 
 
     public SoltrChessGUI(){
@@ -52,13 +53,34 @@ public class SoltrChessGUI extends Application implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        loc=board.getBoardArray();
+        Integer[] location = new Integer[2];
+        GridPane boardScene = new GridPane();
+        for(Button b: buttonList){
+            location[1]=buttonList.indexOf(b)/SIZE_W;
+            location[0]=buttonList.indexOf(b)%SIZE_H;
+            Image image = new Image("File:"+board.getImage(loc[location[0]][location[1]]));
+            b.setGraphic(new ImageView(image));
+        }
 
+        for (char[] row:loc) {
+            for (char id:
+                    row) {
+                System.out.print(id+" ");
+            }
+            System.out.println();
+        }
     }
+
 
 
     public void start(Stage stage) throws FileNotFoundException{
         stage.setTitle("Solitaire Chess");
         BorderPane border = new BorderPane();
+
+        this.board=new Board("config");
+        board.addObserver(this);
+        loc=board.getBoardArray();
 
         border.setCenter(board());
         border.setTop(title());
@@ -68,9 +90,6 @@ public class SoltrChessGUI extends Application implements Observer {
         stage.setScene(scene);
         stage.sizeToScene();
 
-        this.board=new Board("config");
-        board.addObserver(this);
-        loc=board.getBoardArray();
 
         for (char[] row:loc) {
             for (char id:
@@ -88,21 +107,23 @@ public class SoltrChessGUI extends Application implements Observer {
 
     }
 
+
     @Override
     public void stop() throws Exception {
         super.stop();
     }
 
     public GridPane board(){
-        GridPane board = new GridPane();
+        GridPane boardScene = new GridPane();
         for(int i=0; i<SIZE_H; i++){
             for(int j=0;j<SIZE_W; j++){
                 Button button= boardButton(i,j);
-                board.add(button, i, j);
+                boardScene.add(button, i, j);
                 location[i][j]=button;
+                buttonList.add(button);
             }
         }
-        return board;
+        return boardScene;
     }
 
     private VBox title(){
@@ -151,17 +172,10 @@ public class SoltrChessGUI extends Application implements Observer {
                 button.setStyle("-fx-background-color: #ffffff");
         }
         button.setText(col+", "+row);
-        if(loc[row][col]=='K'){
-            button.setText("");
-
-            Integer[] temp = new Integer[2];
-            temp[0]=row;
-            temp[1]=col;
-            King king = new King(temp);
-            button.setOnAction(new pieceHandler(king));
-            Image image = new Image("File:"+king.getImage());
-            System.out.println(king.getImage());
+        if(loc[row][col]!='-'){
+            Image image = new Image("File:"+board.getImage(loc[row][col]));
             button.setGraphic(new ImageView(image));
+            button.setOnAction(new pieceHandler(board.getPiece(row,col)));
         }
         else{
             Integer[] temp = new Integer[2];
@@ -183,14 +197,17 @@ public class SoltrChessGUI extends Application implements Observer {
         @Override
         public void handle(Event event) {
             if(selected==null){
-                if(!piece.getType().equalsIgnoreCase("Empty")) {
+                this.piece.setSelected();
+                if(!piece.getIsSelected()) {
                     selected = piece;
-                    piece.setSelected();
                     System.out.print("success");
                 }
             }
-            else
-                board.move(selected,piece);
+            else {
+                board.move(selected, piece);
+                selected.setSelected();
+                selected=null;
+            }
         }
     }
 

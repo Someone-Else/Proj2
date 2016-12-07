@@ -31,6 +31,11 @@ public abstract class Piece {
     }
     public void setLocation(Integer[] location){this.location=location;}
 
+    @Override
+    public String toString() {
+        return Character.toString(type.charAt(0));
+    }
+
     public abstract boolean validMove(Integer[] moveTo);
 }
 

@@ -19,4 +19,9 @@ public class Knight extends Piece {
             return true;
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "N";
+    }
 }
