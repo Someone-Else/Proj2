@@ -42,7 +42,6 @@ public class SoltrChessGUI extends Application implements Observer {
     private int SIZE_H= 4;
     private Button[][] location = new Button[SIZE_W][SIZE_H];
     private char[][] loc = new char[SIZE_W][SIZE_H];
-    private ArrayList<Piece> pieceList = new ArrayList<>();
     private Piece selected;
     private Board board;
 
@@ -56,21 +55,8 @@ public class SoltrChessGUI extends Application implements Observer {
 
     }
 
-    private void readFile(String fileName) throws FileNotFoundException{
-        File file = new File(fileName);
-        Scanner in = new Scanner(file);
-
-        for(int i=0; i<SIZE_H;i++){
-            String line = in.nextLine();
-            String[] temp = line.split(" ");
-            for (int j=0; j<SIZE_W; j++){
-                loc[i][j]=temp[j].charAt(0);
-            }
-        }
-    }
 
     public void start(Stage stage) throws FileNotFoundException{
-        readFile("config");
         stage.setTitle("Solitaire Chess");
         BorderPane border = new BorderPane();
 
@@ -82,8 +68,9 @@ public class SoltrChessGUI extends Application implements Observer {
         stage.setScene(scene);
         stage.sizeToScene();
 
-        this.board=new Board(loc);
+        this.board=new Board("config");
         board.addObserver(this);
+        loc=board.getBoardArray();
 
         for (char[] row:loc) {
             for (char id:
@@ -171,7 +158,6 @@ public class SoltrChessGUI extends Application implements Observer {
             temp[0]=row;
             temp[1]=col;
             King king = new King(temp);
-            pieceList.add(king);
             button.setOnAction(new pieceHandler(king));
             Image image = new Image("File:"+king.getImage());
             System.out.println(king.getImage());
@@ -203,16 +189,11 @@ public class SoltrChessGUI extends Application implements Observer {
                     System.out.print("success");
                 }
             }
-            else {
-                if (selected.validMove(piece.getLocation())) {
-                    System.out.print("did it again");
-                    selected.setLocation(piece.getLocation());
-
-                    selected=null;
-                }
-            }
+            else
+                board.move(selected,piece);
         }
     }
+
 
     private class ResetHandler implements EventHandler{
         @Override

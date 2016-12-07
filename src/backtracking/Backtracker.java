@@ -7,6 +7,8 @@ package backtracking;/*
  */
 
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -18,7 +20,23 @@ import java.util.Optional;
  * @author jeh (James Heliotis @ RIT CS)
  */
 public class Backtracker {
-    
+    boolean reversed;
+    boolean isSolved;
+    public List<Move> path;
+
+
+    public Backtracker(){
+        this.path = new LinkedList<>();
+        this.reversed = false;
+        this.isSolved = false;
+    }
+
+    public Backtracker(Backtracker b){
+        this.path = new LinkedList<>();
+        this.reversed = false;
+        this.isSolved = false;
+    }
+
     /**
      * Try find a solution, if one exists, for a given configuration.
      * 
@@ -48,9 +66,26 @@ public class Backtracker {
      * @return a list of configurations to get to a goal configuration.
      *         If there are none, return null.
      */
-    public List< Configuration > solveWithPath( Configuration current ) {
-        // YOUR CODE HERE
-        return null;
+    public List<Move> solveWithPath(Configuration current ) {
+       path.remove(null);
+        if(!reversed){
+            Collections.reverse(path);
+            reversed = true;
+        }
+        return path;
+    }
+
+    public List<Move> getPath(){ return path; }
+
+
+    /**
+     * Gets the solution to the puzzle
+     * @param mc - Model to be solved
+     */
+    public void getAnswer(Configuration mc){
+        if(isSolved) path.clear();
+        this.solve(mc);
+        this.reversed = false;
     }
 
 }
